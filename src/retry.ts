@@ -1,3 +1,7 @@
+/**
+ * 待修改
+ */
+
 import { delay } from './delay';
 
 export interface RetryOpts {

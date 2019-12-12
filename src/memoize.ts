@@ -1,4 +1,7 @@
 /**
+ * 待修改
+ */
+/**
  * Caches the results of an async function. When creating a hash to store function results against,
  * the callback is omitted from the hash and an optional hash function can be used.
  *
