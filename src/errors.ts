@@ -9,12 +9,10 @@
  */
 export function transformErrors<T extends Function>(fn: T, errorHandler: Function): T {
   // tslint:disable-next-line:no-any (casting as any to preserve original function type)
-  return ((async (...args: any[]): Promise<any> => {
-    try {
-      return await fn(...args);
-    } catch (err) {
-      return errorHandler(err);
-    }
+  return (((...args: any[]): Promise<any> => {
+    return fn(...args)
+    .then((value: any) => value)
+    .catch((err: any) => errorHandler(err))
     // tslint:disable-next-line:no-any (casting as any to preserve original function type)
   }) as any) as T;
 }

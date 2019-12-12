@@ -7,7 +7,7 @@
  * @returns the error thrown by the promise
  */
 // tslint:disable-next-line:no-any (returns the rejection which is untyped)
-export async function invert(promise: Promise<any>, message?: string): Promise<any> {
+export function invert(promise: Promise<any>, message?: string): Promise<any> {
   message = message || 'Expected promise to reject';
   return promise.then(
     res => {

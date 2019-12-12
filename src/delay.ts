@@ -6,10 +6,10 @@
  * @optionalParam {any} value - the value to return after the delay
  * @returns value - if defined
  */
-export async function delay<T>(delayTimeMs: number, value: T): Promise<T>;
-export async function delay<T>(delayTimeMs: number): Promise<void>;
+export function delay<T>(delayTimeMs: number, value: T): Promise<T>;
+export function delay<T>(delayTimeMs: number): Promise<void>;
 // tslint:disable-next-line:no-any typedef (typed by overload signatures)
-export async function delay<T>(delayTime: any, value?: T): Promise<void | T> {
+export function delay<T>(delayTime: any, value?: T): Promise<void | T> {
   return new Promise(
     // tslint:disable-next-line:no-any (typed by overload signatures)
     resolve => setTimeout(() => resolve(value), delayTime),
@@ -23,9 +23,9 @@ export async function delay<T>(delayTime: any, value?: T): Promise<void | T> {
  * @optionalParam {any} value - the value to return
  * @returns value - if defined
  */
-export async function immediate<T>(value: T): Promise<T>;
-export async function immediate<T>(): Promise<void>;
+export function immediate<T>(value: T): Promise<T>;
+export function immediate<T>(): Promise<void>;
 // tslint:disable-next-line:no-any typedef (typed by overload signatures)
-export async function immediate(value?: any) {
+export function immediate(value?: any) {
   return delay(0, value);
 }
