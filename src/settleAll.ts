@@ -39,7 +39,7 @@ export async function settleAll<T, V>(
   // tslint:disable-next-line:no-any (no way to guarantee error typings)
   errFn: (err: any, ind: number) => V = err => err,
 ): Promise<SettledPromises<T, V>> {
-  const intermediateResults: { errors?: V; results?: T }[] = await Promise.all(
+  return Promise.all(
     (promises || []).map(async (p, i) => {
       try {
         return { results: await p };
@@ -47,13 +47,14 @@ export async function settleAll<T, V>(
         return { errors: await errFn(err, i) };
       }
     }),
-  );
-  const settledPromises: SettledPromises<T, V> = { results: [], errors: [] };
-  for (const result of intermediateResults) {
-    for (const key in result) {
-      // @ts-ignore typings line up, but typescript is hard pressed to agree
-      settledPromises[key].push(result[key]);
+  ).then((intermediateResults: { errors?: V; results?: T }[]) => {
+    const settledPromises: SettledPromises<T, V> = { results: [], errors: [] };
+    for (const result of intermediateResults) {
+      for (const key in result) {
+        // @ts-ignore typings line up, but typescript is hard pressed to agree
+        settledPromises[key].push(result[key]);
+      }
     }
-  }
-  return settledPromises;
+    return settledPromises;
+  });
 }
