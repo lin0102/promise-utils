@@ -35,19 +35,26 @@ export function memoize<FnType extends Function>(
     }
 
     if (queues.has(key)) {
-      return await queues.get(key)!;
+      return Promise.resolve(queues.get(key)!).then(value => value);
     }
 
     const promise: Promise<any> = fn(...args);
     queues.set(key, promise);
 
-    try {
-      const ret: any = await queues.get(key)!;
+    return Promise.resolve(queues.get(key)!).then((ret: any) => {
       memos.set(key, { value: ret, expiration: Date.now() + (timeoutMs || 0) });
       return ret;
-    } finally {
-      queues.delete(key);
-    }
+    })
+    .finally(() => {
+      queues.delete(key)
+    })
+    // try {
+    //   const ret: any = await queues.get(key)!;
+    //   memos.set(key, { value: ret, expiration: Date.now() + (timeoutMs || 0) });
+    //   return ret;
+    // } finally {
+    //   queues.delete(key);
+    // }
   }) as any) as FnType;
 
   const reset = (...args: any[]): void => {
