@@ -24,10 +24,7 @@ export function map<T, V>(
   input: readonly T[],
   iteratee: (value: T, index: number) => Promise<V>,
 ): Promise<V[]>;
-export function map<T, V>(
-  input: readonly T[],
-  iteratee: (value: T) => Promise<V>,
-): Promise<V[]>;
+export function map<T, V>(input: readonly T[], iteratee: (value: T) => Promise<V>): Promise<V[]>;
 export function map<T extends Object, V>(
   input: T,
   iteratee: (value: T[keyof T], key: string) => Promise<V>,
@@ -101,16 +98,21 @@ export function mapLimit<V>(input: any, limit: number, iteratee: any): Promise<V
 
   const execute = () => {
     return new Promise(resolve => {
+      const promises: Promise<any>[] = [];
       while (allValues.length > 0) {
         // tslint:disable-next-line:no-any
         const [val, index, key] = allValues.pop();
-        iteratee(val, key).then((value: any)=> {
-          results[index] = value
-        })
+        promises.push(
+          iteratee(val, key).then((value: any) => {
+            results[index] = value;
+          }),
+        );
         // results[index] = await iteratee(val, key);
       }
-      resolve()
-    })
+      Promise.all(promises).then(() => {
+        resolve();
+      });
+    });
   };
 
   const allExecutors = [];
@@ -118,7 +120,7 @@ export function mapLimit<V>(input: any, limit: number, iteratee: any): Promise<V
     allExecutors.push(execute());
   }
   return Promise.all(allExecutors).then(() => {
-    return results
+    return results;
   });
 }
 
@@ -191,5 +193,5 @@ export function flatMap(input: any, iteratee: any): Promise<any[]> {
       }
     }
     return output;
-  })
+  });
 }
