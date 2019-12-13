@@ -14,38 +14,42 @@ export interface SettledPromises<T, V> {
  *
  * @returns A list of resolved and rejected values of promises.
  */
-export async function settleAll<T, V>(
+export function settleAll<T, V>(
   promises: readonly Promise<T>[],
   // tslint:disable-next-line:no-any (no way to guarantee error typings)
   errFn?: (err: any, ind: number) => Promise<V>,
 ): Promise<SettledPromises<T, V>>;
-export async function settleAll<T, V>(
+export function settleAll<T, V>(
   promises: readonly Promise<T>[],
   // tslint:disable-next-line:no-any (no way to guarantee error typings)
   errFn?: (err: any) => Promise<V>,
 ): Promise<SettledPromises<T, V>>;
-export async function settleAll<T, V>(
+export function settleAll<T, V>(
   promises: readonly Promise<T>[],
   // tslint:disable-next-line:no-any (no way to guarantee error typings)
   errFn?: (err: any, ind: number) => V,
 ): Promise<SettledPromises<T, V>>;
-export async function settleAll<T, V>(
+export function settleAll<T, V>(
   promises: readonly Promise<T>[],
   // tslint:disable-next-line:no-any (no way to guarantee error typings)
   errFn?: (err: any) => V,
 ): Promise<SettledPromises<T, V>>;
-export async function settleAll<T, V>(
+export function settleAll<T, V>(
   promises: readonly Promise<T>[],
   // tslint:disable-next-line:no-any (no way to guarantee error typings)
   errFn: (err: any, ind: number) => V = err => err,
 ): Promise<SettledPromises<T, V>> {
   return Promise.all(
-    (promises || []).map(async (p, i) => {
-      try {
-        return { results: await p };
-      } catch (err) {
-        return { errors: await errFn(err, i) };
-      }
+    (promises || []).map((p, i) => {
+      return p.then(results => {return {results}})
+      .catch(err => {
+        return Promise.resolve(errFn(err, i)).then((errors: V) => {return {errors}})
+      })
+      // try {
+      //   return { results: await p };
+      // } catch (err) {
+      //   return { errors: await errFn(err, i) };
+      // }
     }),
   ).then((intermediateResults: { errors?: V; results?: T }[]) => {
     const settledPromises: SettledPromises<T, V> = { results: [], errors: [] };
